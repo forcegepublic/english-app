@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>每日英语练习</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="英语练习">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== 首页 ===== -->
+  <div id="page-home" class="page active">
+    <div class="home-header">
+      <h1>每日英语练习</h1>
+      <p>坚持每天刷题，英语越来越棒！</p>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-num" id="stat-streak">0</div>
+        <div class="stat-label">连续天数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="stat-score">0</div>
+        <div class="stat-label">总积分</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="stat-done">0</div>
+        <div class="stat-label">今日题数</div>
+      </div>
+    </div>
+
+    <div class="badge-section">
+      <div class="badge-icon" id="badge-icon">🌱</div>
+      <div class="badge-name" id="badge-name">英语新苗</div>
+      <div class="badge-desc" id="badge-desc">刚开始学习，加油！</div>
+    </div>
+
+    <div class="daily-progress">
+      <div class="progress-header">
+        <span class="progress-title">今日目标</span>
+        <span class="progress-text" id="daily-text">0 / 15 题</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="daily-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="section-title">选择练习模块</div>
+
+    <div class="module-cards">
+      <button class="module-card" onclick="startWords()">
+        <div class="module-icon words">📖</div>
+        <div class="module-info">
+          <div class="module-name">单词记忆</div>
+          <div class="module-desc">中英互译，4选1</div>
+          <div class="module-count">题库：50个常用词</div>
+        </div>
+        <div class="module-arrow">›</div>
+      </button>
+
+      <button class="module-card" onclick="startGrammar()">
+        <div class="module-icon grammar">✏️</div>
+        <div class="module-info">
+          <div class="module-name">语法填空</div>
+          <div class="module-desc">句子填空，含知识点讲解</div>
+          <div class="module-count">题库：30道语法题</div>
+        </div>
+        <div class="module-arrow">›</div>
+      </button>
+
+      <button class="module-card" onclick="startListening()">
+        <div class="module-icon listening">🎧</div>
+        <div class="module-info">
+          <div class="module-name">听力练习</div>
+          <div class="module-desc">听句子选答案，可调语速</div>
+          <div class="module-count">题库：20个句子</div>
+        </div>
+        <div class="module-arrow">›</div>
+      </button>
+
+      <button class="module-card" onclick="showMistakes()">
+        <div class="module-icon mistakes">📋</div>
+        <div class="module-info">
+          <div class="module-name">错题本</div>
+          <div class="module-desc">查看做错的题目</div>
+          <div class="module-count">最近50条错题</div>
+        </div>
+        <div class="module-arrow">›</div>
+      </button>
+
+      <button class="module-card" onclick="showImport()">
+        <div class="module-icon" style="background:#f3e5f5">📥</div>
+        <div class="module-info">
+          <div class="module-name">导入题目</div>
+          <div class="module-desc">上传 CSV 文��扩充题库</div>
+          <div class="module-count">支持单词/语法/听力</div>
+        </div>
+        <div class="module-arrow">›</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 练习页（单词/语法/听力共用） ===== -->
+  <div id="page-practice" class="page">
+    <div class="practice-header">
+      <button class="back-btn" onclick="renderHome()">‹</button>
+      <span class="practice-title" id="practice-title">练习</span>
+      <span class="practice-score" id="practice-score-display">0分</span>
+    </div>
+
+    <div class="question-progress">
+      <div class="q-progress-bar">
+        <div class="q-progress-fill" id="q-fill" style="width:0%"></div>
+      </div>
+      <span class="q-progress-text" id="q-progress-text">1/10</span>
+    </div>
+
+    <!-- 听力专属控件 -->
+    <div id="listen-controls" style="display:none">
+      <button class="listen-btn" onclick="replayAudio()">
+        <span class="listen-icon">🔊</span> 再听一遍
+      </button>
+      <div class="speed-toggle">
+        <button class="speed-btn active" data-rate="0.7">慢速</button>
+        <button class="speed-btn" data-rate="1.0">正常</button>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-emoji" id="question-emoji">📖</div>
+      <div class="question-text" id="question-text"></div>
+      <div class="question-sub" id="question-sub"></div>
+      <div class="tip-box" id="tip-box" style="display:none"></div>
+    </div>
+
+    <div class="options-grid" id="options-grid"></div>
+
+    <div class="feedback-box" id="feedback-box"></div>
+
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一题 →</button>
+  </div>
+
+  <!-- ===== 结果页 ===== -->
+  <div id="page-result" class="page">
+    <div class="result-page">
+      <div class="result-emoji" id="result-emoji">🎉</div>
+      <div class="result-title" id="result-title">太棒了！</div>
+      <div class="result-score" id="result-score">100分</div>
+      <div class="result-detail" id="result-detail"></div>
+      <div class="result-actions">
+        <button class="btn-primary" onclick="restartModule()">再练一次</button>
+        <button class="btn-secondary" onclick="renderHome()">返回首页</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 错题本页 ===== -->
+  <div id="page-mistakes" class="page">
+    <div class="practice-header">
+      <button class="back-btn" onclick="renderHome()">‹</button>
+      <span class="practice-title">错题本</span>
+    </div>
+    <div class="mistakes-list" id="mistakes-list"></div>
+  </div>
+
+  <!-- ===== 导入题目页 ===== -->
+  <div id="page-import" class="page">
+    <div class="practice-header">
+      <button class="back-btn" onclick="renderHome()">‹</button>
+      <span class="practice-title">导入题目</span>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:16px;">
+
+      <div class="import-card">
+        <div class="import-card-title">📖 单词题库</div>
+        <div class="import-card-desc">CSV 格式，必须包含列：<code>en,zh</code>，可选：<code>emoji,example</code></div>
+        <div class="import-example">示例：<br>en,zh,emoji,example<br>happy,快乐的,😊,She is happy.</div>
+        <label class="import-btn-label">
+          选��文件
+          <input type="file" id="import-words-file" accept=".csv" style="display:none"
+            onchange="handleImportFile(this.files[0],'words')">
+        </label>
+      </div>
+
+      <div class="import-card">
+        <div class="import-card-title">✏️ 语法题库</div>
+        <div class="import-card-desc">必须包含列：<code>sentence,blank,options</code>（options 用 | 分隔），可选：<code>tip,explanation</code></div>
+        <div class="import-example">示例：<br>sentence,blank,options,tip<br>"She ___ to school.",goes,go|goes|going|gone,第三人称单数加s</div>
+        <label class="import-btn-label">
+          选择文件
+          <input type="file" id="import-grammar-file" accept=".csv" style="display:none"
+            onchange="handleImportFile(this.files[0],'grammar')">
+        </label>
+      </div>
+
+      <div class="import-card">
+        <div class="import-card-title">🎧 听力题库</div>
+        <div class="import-card-desc">必须包含列：<code>text,options,correct</code>（options 用 | 分隔，correct 为正确选项序号 0-3），可选：<code>zh</code></div>
+        <div class="import-example">示例：<br>text,zh,options,correct<br>"I like cats.",我喜欢猫,"I like cats.|I like dogs.|I like fish.|I like birds.",0</div>
+        <label class="import-btn-label">
+          选择文件
+          <input type="file" id="import-listening-file" accept=".csv" style="display:none"
+            onchange="handleImportFile(this.files[0],'listening')">
+        </label>
+      </div>
+
+      <div id="import-msg" style="font-size:15px;font-weight:600;text-align:center;padding:8px;"></div>
+
+      <button class="btn-secondary" onclick="clearCustomData()">清除所有自定义题目</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="data/words.js"></script>
+<script src="data/grammar.js"></script>
+<script src="data/listening.js"></script>
+<script src="app.js"></script>
+<script>
+  // 再练一次
+  function restartModule() {
+    if (state.currentModule === 'words') startWords();
+    else if (state.currentModule === 'grammar') startGrammar();
+    else if (state.currentModule === 'listening') startListening();
+  }
+
+  // 听力重播
+  function replayAudio() {
+    const q = state.questions[state.currentIndex];
+    if (q) speakText(q.text);
+  }
+
+  // 切换听力控件显示
+  function toggleListenControls(show) {
+    document.getElementById('listen-controls').style.display = show ? 'block' : 'none';
+    document.getElementById('options-grid').style.gridTemplateColumns = show ? '1fr' : '1fr 1fr';
+  }
+
+  const _startListening = startListening;
+  window.startListening = function() { toggleListenControls(true); _startListening(); };
+  const _startWords = startWords;
+  window.startWords = function() { toggleListenControls(false); _startWords(); };
+  const _startGrammar = startGrammar;
+  window.startGrammar = function() { toggleListenControls(false); _startGrammar(); };
+
+  // 清除自定义题目
+  function clearCustomData() {
+    if (!confirm('确定清除所有自定义导入的题目吗？')) return;
+    ['words','grammar','listening'].forEach(t => saveCustomData(t, []));
+    document.getElementById('import-msg').textContent = '已清除自定义题目';
+    document.getElementById('import-msg').style.color = '#666';
+    updateModuleCounts();
+  }
+
+  // 注册 Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
